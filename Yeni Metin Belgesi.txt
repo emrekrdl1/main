@@ -1,0 +1,98 @@
+﻿?mkdir django
+cd django
+python -m venv myvenv // myvenv benim koyacağım isim
+myvenv\Scripts\activate // deactivate ise iptal eder
+pip install django~=1.11.0 // ~=1.11.0 koymazsan en güncel kurulur
+django-admin.exe startproject mysite . // . var unutma mysite sitenin başlığı
+python manage.py migrate
+python manage.py runserver // ayarladıktan sonra çalıştırma için ayarlar settings.py de
+python manage.py startapp blog // uygulama oluşturma bunu yaptıktan sonra settings de installed app ye blog yazılacak STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+python manage.py migrate blog // yaptığımız değişiklliği kaydetmek için
+python manage.py makemigrations blog // blog un içine yeni model oluşturuyor model aşağıda
+python manage.py createsuperuser // kullanıcı oluşturuyor admin şeklinde Admin.py içne yazılcaklar aşağıda
+git init
+git config --global user.name "Adınız" 
+git config --global user.email you@example.com // .gitignore dosyası açılacak bu işlemden sonra
+git add --all .
+git commit -m "Django uygulamasında ilk commit'im"
+git remote add origin https://github.com/emrekrdl1/my-first-blog.git // githubdaki kullanıcı adı ve proje adına göre uygun yerler değişir
+git push -u origin master
+https://tutorial.djangogirls.org/tr/deploy/ //bu kısımdaki işlemleri yap
+
+from django.conf.urls import include
+from django.conf.urls import url
+from django.contrib import admin
+urlpatterns = [
+    url(r'^admin/', admin.site.urls),
+    url(r'', include('main.urls')),] // mysite urls nin içine silinerek bunlar eklenir
+from django.conf.urls import url
+from . import views
+urlpatterns = [
+    url(r'^$', views.post_list, name='post_list'),
+    ] // bu satırlar blog un içine urls.py dosyası açılıp yazılır
+def post_list(request):
+    return render(request, 'blog/post_list.html', {}) // bunlar blog içindeki views.py nin içine silindikten sonra yazılır
+blog /new directory templates // blog klasörü içine templates klasörü açılır
+templates / new directory blog / templates içine blog klasörü açılır
+blog/templates/blog/ new post_list.html // en son ki blog klasörü içine html dosyası açılır
+
+Güncelleme işlemi git hub için:
+git add --all .
+git commit -m "Django"
+git push -u origin master
+
+https://tutorial.djangogirls.org/tr/html/
+
+.gitignore
+*.pyc
+*~
+__pycache__
+myvenv
+db.sqlite3
+/static
+.DS_Store
+
+ADMİN
+from django.contrib import admin
+from .models import Post
+admin.site.register(Post)
+
+MODEL
+from django.db import models
+from django.utils import timezone
+class Post(models.Model):
+    author = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    text = models.TextField()
+    created_date = models.DateTimeField(
+            default=timezone.now)
+    published_date = models.DateTimeField(
+            blank=True, null=True)
+
+    def publish(self):
+        self.published_date = timezone.now()
+        self.save()
+
+    def __str__(self):
+        return self.title
+
+SETTİNGS
+/* settings.py'de, TIME_ZONE içeren satırı bulun ve kendi zaman diliminizi seçmek için değiştirin. Örnek olarak:
+
+mysite/settings.py
+TIME_ZONE = 'Europe/Istanbul'
+Bir dil kodu dilden oluşmaktadır, ör. en ingilizce için veya de almanca için, ve ülke kodu da, ör. de almanya için veya chisviçre için. Django'daki varsayılan butonların ve bildirimlerin sizin dilinizde olmasını istiyorsanız bunu eklemek isteyeceksiniz. Böylece "İptal" butonu burada tanımladığınız dile çevrilmiş olacaktır. Django hazırlanmış olan bir çok çeviri ile birlikte gelmektedir.
+
+Aşağıdaki satırı değiştirerek dil kodunu değiştiriniz:
+
+mysite/settings.py
+LANGUAGE_CODE = 'de-ch'
+Ayrıca statik dosyalar için bir yol eklememiz gerekmektedir. (Eğitici ders içerisinde statik dosyalar ve CSS hakkında ayrıntılı bilgi bulabilirsiniz.) Dosyanın son'una gidin, hemen altında sadece STATIC_URL girişi yapın, STATIC_ROOT adında yeni birim ekleyin:
+
+mysite/settings.py
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+DEBUG(Hata Ayıklama) True(Doğru) ve ALLOWED_HOSTS boş olduğu zaman ana bilgisayar ['localhost', '127.0.0.1', '[::1]']'a karşı doğrulanır. Bu, uygulamamızı dağıttıktan sonra, PythonAnywhere'deki anamakine adıyla eşleşmeyecek ve böylece aşağıdaki ayarları değiştireceğiz:
+
+mysite/settings.py
+ALLOWED_HOSTS = ['127.0.0.1', '.pythonanywhere.com']
